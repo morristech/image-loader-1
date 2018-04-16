@@ -29,7 +29,7 @@ import java.util.*
 import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
 
-internal class MemoryImageCache @JvmOverloads constructor(
+internal class MemoryImageCache constructor(
         private val mMaxSize: Int = Math.round(Runtime.getRuntime().maxMemory() * DEFAULT_MEMORY_FRACTION)) :
         ImageCache {
     private val mImages: LinkedHashMap<String, Bitmap>

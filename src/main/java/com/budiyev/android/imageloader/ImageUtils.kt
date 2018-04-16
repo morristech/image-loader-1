@@ -213,7 +213,6 @@ object ImageUtils {
      * @param image Source image
      * @return Converted image
      */
-    @JvmOverloads
     fun tint(image: Bitmap, @ColorInt color: Int, mode: PorterDuff.Mode = PorterDuff.Mode.SRC_ATOP): Bitmap {
         val colorMatrix = ColorMatrix()
         colorMatrix.setSaturation(0f)
@@ -421,7 +420,6 @@ object ImageUtils {
      * @param upscale      Upscale image if it is smaller than the frame
      * @return Scaled image or original image
      */
-    @JvmOverloads
     fun scaleToFit(image: Bitmap, resultWidth: Int, resultHeight: Int, upscale: Boolean = false): Bitmap {
         val sourceWidth = image.width
         val sourceHeight = image.height
@@ -490,8 +488,8 @@ object ImageUtils {
         }
     }
 
-    private class TintTransformation (@param:ColorInt private val mColor: Int,
-            private val mMode: PorterDuff.Mode) : BitmapTransformation {
+    private class TintTransformation(@param:ColorInt private val mColor: Int, private val mMode: PorterDuff.Mode) :
+            BitmapTransformation {
         override val key: String = "_tint_" + mColor + "_" + mMode
 
         override fun transform(bitmap: Bitmap): Bitmap {

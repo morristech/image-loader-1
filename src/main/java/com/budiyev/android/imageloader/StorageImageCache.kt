@@ -54,8 +54,7 @@ internal class StorageImageCache(directory: File, compressMode: CompressMode, pr
             compressMode, maxSize) {
     }
 
-    @JvmOverloads constructor(directory: File, maxSize: Long = DEFAULT_MAX_SIZE) : this(directory,
-            CompressMode.LOSSLESS, maxSize) {
+    constructor(directory: File, maxSize: Long = DEFAULT_MAX_SIZE) : this(directory, CompressMode.LOSSLESS, maxSize) {
     }
 
     init {
