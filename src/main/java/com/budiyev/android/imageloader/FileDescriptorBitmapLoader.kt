@@ -39,7 +39,7 @@ internal class FileDescriptorBitmapLoader : BitmapLoader<FileDescriptor> {
                 inputStream = FileInputStream(data)
                 return BitmapFactory.decodeStream(inputStream)
             } finally {
-                InternalUtils.close(inputStream)
+                close(inputStream)
             }
         }
     }

@@ -168,7 +168,7 @@ class ImageRequest<T> internal constructor(private val mResources: Resources,
      * @see BitmapTransformation
      */
     fun transform(transformation: BitmapTransformation): ImageRequest<T> {
-        transformations().add(InternalUtils.requireNonNull(transformation))
+        transformations().add(requireNonNull(transformation))
         return this
     }
 
@@ -180,7 +180,7 @@ class ImageRequest<T> internal constructor(private val mResources: Resources,
      * @see BitmapTransformation
      */
     fun transform(transformations: Collection<BitmapTransformation>): ImageRequest<T> {
-        transformations().addAll(InternalUtils.requireNonNull(transformations))
+        transformations().addAll(requireNonNull(transformations))
         return this
     }
 
@@ -316,18 +316,18 @@ class ImageRequest<T> internal constructor(private val mResources: Resources,
         val memoryCache = memoryCache
         val cornerRadius = mCornerRadius
         var image: Bitmap? = null
-        val key = InternalUtils.buildFullKey(descriptor.key, requiredSize, transformation)
+        val key = buildFullKey(descriptor.key, requiredSize, transformation)
         if (key != null && memoryCache != null) {
             image = memoryCache.get(key)
         }
-        val currentAction = InternalUtils.getDisplayImageAction(view)
+        val currentAction = getDisplayImageAction(view)
         if (image != null) {
             currentAction?.cancel()
             loadCallback?.onLoaded(image)
             if (cornerRadius > 0 || cornerRadius == RoundedDrawable.MAX_RADIUS) {
-                InternalUtils.setDrawable(RoundedDrawable(resources, image, cornerRadius), view)
+                setDrawable(RoundedDrawable(resources, image, cornerRadius), view)
             } else {
-                InternalUtils.setBitmap(resources, image, view)
+                setBitmap(resources, image, view)
             }
             displayCallback?.onDisplayed(image, view)
             return EmptyImageRequestDelegate.INSTANCE
@@ -345,7 +345,7 @@ class ImageRequest<T> internal constructor(private val mResources: Resources,
         val action = DisplayImageAction(resources, view, descriptor, mBitmapLoader, requiredSize, transformation,
                 placeholder, mErrorDrawable, memoryCache, storageCache, mCacheExecutor, loadCallback, mErrorCallback,
                 displayCallback, mPauseLock, mMainThreadHandler, mFadeEnabled, mFadeDuration, cornerRadius)
-        InternalUtils.setDrawable(PlaceholderDrawable(placeholder, action), view)
+        setDrawable(PlaceholderDrawable(placeholder, action), view)
         return action.submit(mLoadExecutor)
     }
 

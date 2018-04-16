@@ -58,8 +58,8 @@ internal class StorageImageCache(directory: File, compressMode: CompressMode, pr
     }
 
     init {
-        mDirectory = InternalUtils.requireNonNull(directory)
-        mCompressMode = InternalUtils.requireNonNull(compressMode)
+        mDirectory = requireNonNull(directory)
+        mCompressMode = requireNonNull(compressMode)
         if (mMaxSize < 0L) {
             throw IllegalArgumentException("Cache size should be greater than or equal to zero")
         }
@@ -94,7 +94,7 @@ internal class StorageImageCache(directory: File, compressMode: CompressMode, pr
             bitmap = BitmapFactory.decodeByteArray(outputBuffer.array, 0, outputBuffer.size)
         } catch (ignored: IOException) {
         } finally {
-            InternalUtils.close(inputStream)
+            close(inputStream)
         }
         if (bitmap != null) {
             file.setLastModified(System.currentTimeMillis())
@@ -129,7 +129,7 @@ internal class StorageImageCache(directory: File, compressMode: CompressMode, pr
             } catch (e: IOException) {
                 success = false
             } finally {
-                InternalUtils.close(output)
+                close(output)
             }
             if (success) {
                 mLock.lock()

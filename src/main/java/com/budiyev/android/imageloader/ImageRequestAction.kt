@@ -40,7 +40,6 @@ internal abstract class ImageRequestAction : ImageRequestDelegate, Callable<Void
 
     protected abstract fun onCancelled()
 
-    @Throws(Exception::class)
     override fun call(): Void? {
         execute()
         return null

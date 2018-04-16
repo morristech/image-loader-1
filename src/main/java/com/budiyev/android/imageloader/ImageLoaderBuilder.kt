@@ -148,11 +148,11 @@ class ImageLoaderBuilder internal constructor(private val mContext: Context) {
     fun build(): ImageLoader {
         var loadExecutor = mLoadExecutor
         if (loadExecutor == null) {
-            loadExecutor = ImageLoaderExecutor(InternalUtils.loadPoolSize)
+            loadExecutor = ImageLoaderExecutor(loadPoolSize)
         }
         var cacheExecutor = mCacheExecutor
         if (cacheExecutor == null) {
-            cacheExecutor = ImageLoaderExecutor(InternalUtils.cachePoolSize)
+            cacheExecutor = ImageLoaderExecutor(cachePoolSize)
         }
         val context = mContext
         val loader = ImageLoader(context, loadExecutor, cacheExecutor, mMemoryCache, mStorageCache)

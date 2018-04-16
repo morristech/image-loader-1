@@ -41,166 +41,155 @@ import java.io.IOException
 import java.io.InputStream
 import java.net.URL
 
-internal object InternalUtils {
-    private const val CONNECT_TIMEOUT = 10000
-    private const val MAX_POOL_SIZE = 4
-    private const val MIN_POOL_SIZE = 1
-    private const val URI_SCHEME_HTTP = "http"
-    private const val URI_SCHEME_HTTPS = "https"
-    private const val URI_SCHEME_FTP = "ftp"
+private const val CONNECT_TIMEOUT = 10000
+private const val MAX_POOL_SIZE = 4
+private const val MIN_POOL_SIZE = 1
+private const val URI_SCHEME_HTTP = "http"
+private const val URI_SCHEME_HTTPS = "https"
+private const val URI_SCHEME_FTP = "ftp"
 
-    val loadPoolSize: Int
-        get() = Math.min(Runtime.getRuntime().availableProcessors(), MAX_POOL_SIZE)
+val loadPoolSize: Int
+    get() = Math.min(Runtime.getRuntime().availableProcessors(), MAX_POOL_SIZE)
 
-    val cachePoolSize: Int
-        get() {
-            val size = loadPoolSize / 2
-            return if (size < MIN_POOL_SIZE) {
-                MIN_POOL_SIZE
-            } else {
-                size
-            }
-        }
-
-    fun invalidate(memoryCache: ImageCache?, storageCache: ImageCache?, descriptor: DataDescriptor<*>) {
-        val key = descriptor.key ?: return
-        memoryCache?.remove(key)
-        storageCache?.remove(key)
-    }
-
-    fun buildFullKey(base: String?, requiredSize: Size?, transformation: BitmapTransformation?): String? {
-        if (base == null) {
-            return null
-        }
-        if (requiredSize == null && transformation == null) {
-            return base
-        }
-        val sb = StringBuilder(base)
-        if (requiredSize != null) {
-            sb.append("_required_size_").append(requiredSize.width).append("x").append(requiredSize.height)
-        }
-        if (transformation != null) {
-            sb.append(transformation.key)
-        }
-        return sb.toString()
-    }
-
-    fun close(closeable: Closeable?) {
-        if (closeable == null) {
-            return
-        }
-        try {
-            closeable.close()
-        } catch (ignored: IOException) {
-        }
-
-    }
-
-    @Throws(IOException::class)
-    fun getDataStreamFromUri(context: Context, uri: Uri): InputStream? {
-        val scheme = uri.scheme
-        if (URI_SCHEME_HTTP.equals(scheme, ignoreCase = true) || URI_SCHEME_HTTPS.equals(scheme,
-                        ignoreCase = true) || URI_SCHEME_FTP.equals(scheme, ignoreCase = true)) {
-            val connection = URL(uri.toString()).openConnection()
-            connection.connectTimeout = CONNECT_TIMEOUT
-            return connection.getInputStream()
+val cachePoolSize: Int
+    get() {
+        val size = loadPoolSize / 2
+        return if (size < MIN_POOL_SIZE) {
+            MIN_POOL_SIZE
         } else {
-            return context.contentResolver.openInputStream(uri)
+            size
         }
     }
 
-    @Throws(IOException::class)
-    fun getDataStreamFromUrl(url: String): InputStream? {
-        val connection = URL(url).openConnection()
-        connection.connectTimeout = CONNECT_TIMEOUT
-        return connection.getInputStream()
-    }
+internal fun invalidate(memoryCache: ImageCache?, storageCache: ImageCache?, descriptor: DataDescriptor<*>) {
+    val key = descriptor.key ?: return
+    memoryCache?.remove(key)
+    storageCache?.remove(key)
+}
 
-    @MainThread
-    fun getDisplayImageAction(view: View?): DisplayImageAction<*>? {
-        if (view != null) {
-            val drawable = getDrawable(view)
-            if (drawable is PlaceholderDrawable) {
-                return drawable.action
-            }
-        }
+internal fun buildFullKey(base: String?, requiredSize: Size?, transformation: BitmapTransformation?): String? {
+    if (base == null) {
         return null
     }
+    if (requiredSize == null && transformation == null) {
+        return base
+    }
+    val sb = StringBuilder(base)
+    if (requiredSize != null) {
+        sb.append("_required_size_").append(requiredSize.width).append("x").append(requiredSize.height)
+    }
+    if (transformation != null) {
+        sb.append(transformation.key)
+    }
+    return sb.toString()
+}
 
-    fun setDrawable(drawable: Drawable, view: View) {
-        if (view is ImageView) {
-            view.setImageDrawable(drawable)
-        } else {
-            view.background = drawable
+internal fun close(closeable: Closeable?) {
+    if (closeable == null) {
+        return
+    }
+    try {
+        closeable.close()
+    } catch (ignored: IOException) {
+    }
+
+}
+
+internal fun getDataStreamFromUri(context: Context, uri: Uri): InputStream? {
+    val scheme = uri.scheme
+    if (URI_SCHEME_HTTP.equals(scheme, ignoreCase = true) || URI_SCHEME_HTTPS.equals(scheme,
+                    ignoreCase = true) || URI_SCHEME_FTP.equals(scheme, ignoreCase = true)) {
+        val connection = URL(uri.toString()).openConnection()
+        connection.connectTimeout = CONNECT_TIMEOUT
+        return connection.getInputStream()
+    } else {
+        return context.contentResolver.openInputStream(uri)
+    }
+}
+
+internal fun getDataStreamFromUrl(url: String): InputStream? {
+    val connection = URL(url).openConnection()
+    connection.connectTimeout = CONNECT_TIMEOUT
+    return connection.getInputStream()
+}
+
+@MainThread
+internal fun getDisplayImageAction(view: View?): DisplayImageAction<*>? {
+    if (view != null) {
+        val drawable = getDrawable(view)
+        if (drawable is PlaceholderDrawable) {
+            return drawable.action
         }
     }
+    return null
+}
 
-    fun setBitmap(resources: Resources, bitmap: Bitmap, view: View) {
-        if (view is ImageView) {
-            view.setImageBitmap(bitmap)
-        } else {
-            view.background = BitmapDrawable(resources, bitmap)
+internal fun setDrawable(drawable: Drawable, view: View) {
+    if (view is ImageView) {
+        view.setImageDrawable(drawable)
+    } else {
+        view.background = drawable
+    }
+}
+
+internal fun setBitmap(resources: Resources, bitmap: Bitmap, view: View) {
+    if (view is ImageView) {
+        view.setImageBitmap(bitmap)
+    } else {
+        view.background = BitmapDrawable(resources, bitmap)
+    }
+}
+
+internal fun getDrawable(view: View): Drawable? {
+    return if (view is ImageView) {
+        view.drawable
+    } else {
+        view.background
+    }
+}
+
+internal fun isUriLocal(uri: Uri): Boolean {
+    return isUriSchemeLocal(uri.scheme)
+}
+
+internal fun isUriLocal(uri: String): Boolean {
+    val ssi = uri.indexOf(':')
+    return ssi != -1 && isUriSchemeLocal(uri.substring(0, ssi))
+
+}
+
+private fun isUriSchemeLocal(scheme: String): Boolean {
+    return ContentResolver.SCHEME_FILE == scheme || ContentResolver.SCHEME_CONTENT == scheme || ContentResolver.SCHEME_ANDROID_RESOURCE == scheme
+}
+
+internal fun getExifRotation(context: Context, uri: Uri): Int = context.contentResolver.openInputStream(uri)?.use {
+    getExifRotation(ExifInterface(it))
+} ?: 0
+
+internal fun getExifRotation(file: File): Int = try {
+    getExifRotation(ExifInterface(file.absolutePath))
+} catch (e: IOException) {
+    0
+}
+
+internal fun getExifRotation(bytes: ByteArray): Int = try {
+    getExifRotation(ExifInterface(ByteArrayInputStream(bytes)))
+} catch (e: IOException) {
+    0
+}
+
+internal fun getExifRotation(exifInterface: ExifInterface): Int =
+        when (exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)) {
+            ExifInterface.ORIENTATION_ROTATE_90 -> 90
+            ExifInterface.ORIENTATION_ROTATE_180 -> 180
+            ExifInterface.ORIENTATION_ROTATE_270 -> 270
+            else -> 0
         }
+
+internal fun rotateAndRecycle(bitmap: Bitmap, rotation: Int): Bitmap {
+    val rotated = ImageUtils.rotate(bitmap, rotation.toFloat())
+    if (bitmap != rotated) {
+        bitmap.recycle()
     }
-
-    fun getDrawable(view: View): Drawable? {
-        return if (view is ImageView) {
-            view.drawable
-        } else {
-            view.background
-        }
-    }
-
-    fun isUriLocal(uri: Uri): Boolean {
-        return isUriSchemeLocal(uri.scheme)
-    }
-
-    fun isUriLocal(uri: String): Boolean {
-        val ssi = uri.indexOf(':')
-        return ssi != -1 && isUriSchemeLocal(uri.substring(0, ssi))
-
-    }
-
-    private fun isUriSchemeLocal(scheme: String): Boolean {
-        return ContentResolver.SCHEME_FILE == scheme || ContentResolver.SCHEME_CONTENT == scheme || ContentResolver.SCHEME_ANDROID_RESOURCE == scheme
-    }
-
-    fun getExifRotation(context: Context, uri: Uri): Int = context.contentResolver.openInputStream(uri)?.use {
-        getExifRotation(ExifInterface(it))
-    } ?: 0
-
-    fun getExifRotation(file: File): Int = try {
-        getExifRotation(ExifInterface(file.absolutePath))
-    } catch (e: IOException) {
-        0
-    }
-
-    fun getExifRotation(bytes: ByteArray): Int = try {
-        getExifRotation(ExifInterface(ByteArrayInputStream(bytes)))
-    } catch (e: IOException) {
-        0
-    }
-
-    fun getExifRotation(exifInterface: ExifInterface): Int =
-            when (exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)) {
-                ExifInterface.ORIENTATION_ROTATE_90 -> 90
-                ExifInterface.ORIENTATION_ROTATE_180 -> 180
-                ExifInterface.ORIENTATION_ROTATE_270 -> 270
-                else -> 0
-            }
-
-    fun rotateAndRecycle(bitmap: Bitmap, rotation: Int): Bitmap {
-        val rotated = ImageUtils.rotate(bitmap, rotation.toFloat())
-        if (bitmap != rotated) {
-            bitmap.recycle()
-        }
-        return rotated
-    }
-
-    fun <T> requireNonNull(value: T?): T {
-        if (value == null) {
-            throw NullPointerException()
-        }
-        return value
-    }
+    return rotated
 }

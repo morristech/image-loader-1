@@ -33,7 +33,7 @@ val Context.imageLoader: ImageLoader
     get() {
         var i = instance
         if (i == null) {
-            LOCK.lock()
+            instanceLock.lock()
             try {
                 i = instance
                 if (i == null) {
@@ -43,7 +43,7 @@ val Context.imageLoader: ImageLoader
                     instance = i
                 }
             } finally {
-                LOCK.unlock()
+                instanceLock.unlock()
             }
         }
         return i ?: throw AssertionError()
@@ -65,7 +65,7 @@ private class ClearMemoryCallbacks : ComponentCallbacks2 {
     }
 }
 
-private val LOCK = ReentrantLock()
+private val instanceLock = ReentrantLock()
 
 @Volatile
 @SuppressLint("StaticFieldLeak")

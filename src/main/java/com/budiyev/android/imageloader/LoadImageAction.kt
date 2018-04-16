@@ -37,7 +37,7 @@ internal abstract class LoadImageAction<T> protected constructor(protected val d
     private var mCacheDelegate: ImageRequestDelegate? = null
 
     protected val key: String?
-        get() = InternalUtils.buildFullKey(descriptor.key, requiredSize, mTransformation)
+        get() = buildFullKey(descriptor.key, requiredSize, mTransformation)
 
     @WorkerThread
     protected abstract fun onImageLoaded(image: Bitmap)

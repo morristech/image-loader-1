@@ -40,13 +40,13 @@ internal class FileBitmapLoader : BitmapLoader<File> {
                 inputStream = FileInputStream(data)
                 bitmap = BitmapFactory.decodeStream(inputStream)
             } finally {
-                InternalUtils.close(inputStream)
+                close(inputStream)
             }
         }
         if (bitmap != null) {
-            val rotation = InternalUtils.getExifRotation(data)
+            val rotation = getExifRotation(data)
             if (rotation != 0) {
-                bitmap = InternalUtils.rotateAndRecycle(bitmap, rotation)
+                bitmap = rotateAndRecycle(bitmap, rotation)
             }
         }
         return bitmap

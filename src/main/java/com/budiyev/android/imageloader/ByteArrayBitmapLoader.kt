@@ -35,9 +35,9 @@ internal class ByteArrayBitmapLoader : BitmapLoader<ByteArray> {
             bitmap = BitmapFactory.decodeByteArray(data, 0, data.size)
         }
         if (bitmap != null) {
-            val rotation = InternalUtils.getExifRotation(data)
+            val rotation = getExifRotation(data)
             if (rotation != 0) {
-                bitmap = InternalUtils.rotateAndRecycle(bitmap, rotation)
+                bitmap = rotateAndRecycle(bitmap, rotation)
             }
         }
         return bitmap

@@ -32,7 +32,6 @@ import android.support.annotation.WorkerThread
 import java.io.File
 import java.io.FileDescriptor
 import java.io.FileInputStream
-import java.io.IOException
 import java.io.InputStream
 import java.math.BigInteger
 import java.security.MessageDigest
@@ -70,30 +69,30 @@ object DataUtils {
      * @return Loaded bitmap or `null`
      */
     @WorkerThread
-    @Throws(IOException::class)
+
     fun loadSampledBitmapFromUri(context: Context, uri: Uri, requiredWidth: Int, requiredHeight: Int): Bitmap? {
         val options = BitmapFactory.Options()
         options.inJustDecodeBounds = true
         var inputStream: InputStream? = null
         try {
-            inputStream = InternalUtils.getDataStreamFromUri(context, uri)
+            inputStream = getDataStreamFromUri(context, uri)
             if (inputStream == null) {
                 return null
             }
             BitmapFactory.decodeStream(inputStream, null, options)
         } finally {
-            InternalUtils.close(inputStream)
+            close(inputStream)
         }
         calculateSampleSize(options, requiredWidth, requiredHeight)
         options.inJustDecodeBounds = false
         inputStream = null
         try {
-            inputStream = InternalUtils.getDataStreamFromUri(context, uri)
+            inputStream = getDataStreamFromUri(context, uri)
             return if (inputStream == null) {
                 null
             } else BitmapFactory.decodeStream(inputStream, null, options)
         } finally {
-            InternalUtils.close(inputStream)
+            close(inputStream)
         }
     }
 
@@ -106,30 +105,30 @@ object DataUtils {
      * @return Loaded bitmap or `null`
      */
     @WorkerThread
-    @Throws(IOException::class)
+
     fun loadSampledBitmapFromUrl(url: String, requiredWidth: Int, requiredHeight: Int): Bitmap? {
         val options = BitmapFactory.Options()
         options.inJustDecodeBounds = true
         var inputStream: InputStream? = null
         try {
-            inputStream = InternalUtils.getDataStreamFromUrl(url)
+            inputStream = getDataStreamFromUrl(url)
             if (inputStream == null) {
                 return null
             }
             BitmapFactory.decodeStream(inputStream, null, options)
         } finally {
-            InternalUtils.close(inputStream)
+            close(inputStream)
         }
         calculateSampleSize(options, requiredWidth, requiredHeight)
         options.inJustDecodeBounds = false
         inputStream = null
         try {
-            inputStream = InternalUtils.getDataStreamFromUrl(url)
+            inputStream = getDataStreamFromUrl(url)
             return if (inputStream == null) {
                 null
             } else BitmapFactory.decodeStream(inputStream, null, options)
         } finally {
-            InternalUtils.close(inputStream)
+            close(inputStream)
         }
     }
 
@@ -142,7 +141,7 @@ object DataUtils {
      * @return Loaded bitmap or `null`
      */
     @WorkerThread
-    @Throws(IOException::class)
+
     fun loadSampledBitmapFromFile(file: File, requiredWidth: Int, requiredHeight: Int): Bitmap? {
         val options = BitmapFactory.Options()
         options.inJustDecodeBounds = true
@@ -151,7 +150,7 @@ object DataUtils {
             inputStream = FileInputStream(file)
             BitmapFactory.decodeStream(inputStream, null, options)
         } finally {
-            InternalUtils.close(inputStream)
+            close(inputStream)
         }
         calculateSampleSize(options, requiredWidth, requiredHeight)
         options.inJustDecodeBounds = false
@@ -160,7 +159,7 @@ object DataUtils {
             inputStream = FileInputStream(file)
             return BitmapFactory.decodeStream(inputStream, null, options)
         } finally {
-            InternalUtils.close(inputStream)
+            close(inputStream)
         }
 
     }
@@ -183,7 +182,7 @@ object DataUtils {
             inputStream = FileInputStream(fileDescriptor)
             BitmapFactory.decodeStream(inputStream, null, options)
         } finally {
-            InternalUtils.close(inputStream)
+            close(inputStream)
         }
         calculateSampleSize(options, requiredWidth, requiredHeight)
         options.inJustDecodeBounds = false
@@ -192,7 +191,7 @@ object DataUtils {
             inputStream = FileInputStream(fileDescriptor)
             return BitmapFactory.decodeStream(inputStream, null, options)
         } finally {
-            InternalUtils.close(inputStream)
+            close(inputStream)
         }
     }
 

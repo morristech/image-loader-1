@@ -72,14 +72,13 @@ internal class DisplayImageAction<T>(resources: Resources, view: View, descripto
             }
             val errorDrawable = mErrorDrawable
             val view = mView.get()
-            if (errorDrawable == null || view == null || InternalUtils.getDisplayImageAction(
-                            view) != this@DisplayImageAction) {
+            if (errorDrawable == null || view == null || getDisplayImageAction(view) != this@DisplayImageAction) {
                 return
             }
             if (mFadeEnabled && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                InternalUtils.setDrawable(FadeDrawable(mPlaceholder, errorDrawable, mFadeDuration), view)
+                setDrawable(FadeDrawable(mPlaceholder, errorDrawable, mFadeDuration), view)
             } else {
-                InternalUtils.setDrawable(errorDrawable, view)
+                setDrawable(errorDrawable, view)
             }
         }
     }
@@ -93,22 +92,20 @@ internal class DisplayImageAction<T>(resources: Resources, view: View, descripto
             }
             val view = mView.get()
             val resources = mResources.get()
-            if (view == null || resources == null || InternalUtils.getDisplayImageAction(
-                            view) != this@DisplayImageAction) {
+            if (view == null || resources == null || getDisplayImageAction(view) != this@DisplayImageAction) {
                 return
             }
             val image = mImage
             val cornerRadius = mCornerRadius
             val roundCorners = cornerRadius > 0 || cornerRadius == RoundedDrawable.MAX_RADIUS
             if (mFadeEnabled && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                InternalUtils.setDrawable(
-                        FadeDrawable(mPlaceholder, if (roundCorners) RoundedDrawable(resources, image, cornerRadius)
-                        else BitmapDrawable(resources, image), mFadeDuration), view)
+                setDrawable(FadeDrawable(mPlaceholder, if (roundCorners) RoundedDrawable(resources, image, cornerRadius)
+                else BitmapDrawable(resources, image), mFadeDuration), view)
             } else {
                 if (roundCorners) {
-                    InternalUtils.setDrawable(RoundedDrawable(resources, image, cornerRadius), view)
+                    setDrawable(RoundedDrawable(resources, image, cornerRadius), view)
                 } else {
-                    InternalUtils.setBitmap(resources, image, view)
+                    setBitmap(resources, image, view)
                 }
             }
             val displayCallback = mDisplayCallback

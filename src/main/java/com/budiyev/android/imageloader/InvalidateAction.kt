@@ -28,7 +28,7 @@ internal class InvalidateAction(private val mDescriptor: DataDescriptor<*>, priv
 
     override fun execute() {
         if (!isCancelled) {
-            InternalUtils.invalidate(mMemoryCache, mStorageCache, mDescriptor)
+            invalidate(mMemoryCache, mStorageCache, mDescriptor)
         }
     }
 

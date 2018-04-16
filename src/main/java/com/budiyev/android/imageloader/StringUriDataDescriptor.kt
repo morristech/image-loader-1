@@ -27,6 +27,6 @@ internal class StringUriDataDescriptor(data: String) : IdentifiableDataDescripto
     override val location: DataLocation
 
     init {
-        location = if (InternalUtils.isUriLocal(data)) DataLocation.LOCAL else DataLocation.REMOTE
+        location = if (isUriLocal(data)) DataLocation.LOCAL else DataLocation.REMOTE
     }
 }

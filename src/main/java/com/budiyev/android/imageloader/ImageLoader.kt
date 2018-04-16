@@ -109,7 +109,7 @@ class ImageLoader internal constructor(private val context: Context, private val
         val dataClassName = data.javaClass.name
         val descriptorFactory = descriptorFactories[dataClassName] ?: throw IllegalArgumentException(
                 "Unsupported data type: $dataClassName")
-        InternalUtils.invalidate(memoryCache, storageCache, descriptorFactory.newDescriptor(data))
+        invalidate(memoryCache, storageCache, descriptorFactory.newDescriptor(data))
     }
 
     /**
