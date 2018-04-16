@@ -156,13 +156,13 @@ class ImageLoaderBuilder internal constructor(private val mContext: Context) {
         }
         val context = mContext
         val loader = ImageLoader(context, loadExecutor, cacheExecutor, mMemoryCache, mStorageCache)
-        loader.registerDataType(Uri::class.java, UriDataDescriptorFactory(), UriBitmapLoader(context))
-        loader.registerDataType(File::class.java, FileDataDescriptorFactory(), FileBitmapLoader())
-        loader.registerDataType(String::class.java, StringUriDataDescriptorFactory(), StringUriBitmapLoader(context))
-        loader.registerDataType(Int::class.java, ResourceDataDescriptorFactory(), ResourceBitmapLoader(context))
-        loader.registerDataType(FileDescriptor::class.java, FileDescriptorDataDescriptorFactory(),
+        loader.registerDataType(Uri::class, UriDataDescriptorFactory(), UriBitmapLoader(context))
+        loader.registerDataType(File::class, FileDataDescriptorFactory(), FileBitmapLoader())
+        loader.registerDataType(String::class, StringUriDataDescriptorFactory(), StringUriBitmapLoader(context))
+        loader.registerDataType(Int::class, ResourceDataDescriptorFactory(), ResourceBitmapLoader(context))
+        loader.registerDataType(FileDescriptor::class, FileDescriptorDataDescriptorFactory(),
                 FileDescriptorBitmapLoader())
-        loader.registerDataType(ByteArray::class.java, ByteArrayDataDescriptorFactory(), ByteArrayBitmapLoader())
+        loader.registerDataType(ByteArray::class, ByteArrayDataDescriptorFactory(), ByteArrayBitmapLoader())
         return loader
     }
 }
