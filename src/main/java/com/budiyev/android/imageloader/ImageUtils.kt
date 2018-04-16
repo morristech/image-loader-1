@@ -475,7 +475,6 @@ object ImageUtils {
         override val key: String
             get() = "_invert_colors"
 
-        @Throws(Throwable::class)
         override fun transform(bitmap: Bitmap): Bitmap {
             return invertColors(bitmap)
         }
@@ -486,21 +485,15 @@ object ImageUtils {
         override val key: String
             get() = "_gray_scale"
 
-        @Throws(Throwable::class)
         override fun transform(bitmap: Bitmap): Bitmap {
             return convertToGrayScale(bitmap)
         }
     }
 
-    private class TintTransformation constructor(@param:ColorInt private val mColor: Int,
+    private class TintTransformation (@param:ColorInt private val mColor: Int,
             private val mMode: PorterDuff.Mode) : BitmapTransformation {
-        override val key: String
+        override val key: String = "_tint_" + mColor + "_" + mMode
 
-        init {
-            key = "_tint_" + mColor + "_" + mMode
-        }
-
-        @Throws(Throwable::class)
         override fun transform(bitmap: Bitmap): Bitmap {
             return tint(bitmap, mColor, mMode)
         }
@@ -511,7 +504,6 @@ object ImageUtils {
         override val key: String
             get() = "_mirror_horizontally"
 
-        @Throws(Throwable::class)
         override fun transform(bitmap: Bitmap): Bitmap {
             return mirrorHorizontally(bitmap)
         }
@@ -522,7 +514,6 @@ object ImageUtils {
         override val key: String
             get() = "_mirror_vertically"
 
-        @Throws(Throwable::class)
         override fun transform(bitmap: Bitmap): Bitmap {
             return mirrorVertically(bitmap)
         }
@@ -538,7 +529,6 @@ object ImageUtils {
             key = "_rotate_$a"
         }
 
-        @Throws(Throwable::class)
         override fun transform(bitmap: Bitmap): Bitmap {
             return rotate(bitmap, mAngle)
         }
@@ -558,7 +548,6 @@ object ImageUtils {
             key = "_round_corners_max"
         }
 
-        @Throws(Throwable::class)
         override fun transform(bitmap: Bitmap): Bitmap {
             var radius = mRadius
             if (radius == -1f) {
@@ -585,7 +574,6 @@ object ImageUtils {
             key = "_crop_center_square"
         }
 
-        @Throws(Throwable::class)
         override fun transform(bitmap: Bitmap): Bitmap {
             return if (mWidth > 0 && mHeight > 0) {
                 cropCenter(bitmap, mWidth, mHeight)
@@ -612,7 +600,6 @@ object ImageUtils {
             key = "_fit_center_" + width + "x" + height
         }
 
-        @Throws(Throwable::class)
         override fun transform(bitmap: Bitmap): Bitmap {
             return if (mWidth > 0 && mHeight > 0) {
                 fitCenter(bitmap, mWidth, mHeight)
@@ -630,25 +617,8 @@ object ImageUtils {
             key = "_scale_to_fit_" + mUpscale + "_" + mWidth + "x" + mHeight
         }
 
-        @Throws(Throwable::class)
         override fun transform(bitmap: Bitmap): Bitmap {
             return scaleToFit(bitmap, mWidth, mHeight, mUpscale)
         }
     }
 }
-/**
- * Convert image colors to gray-scale
- *
- * @param image Source image
- * @return Converted image
- */
-/**
- * Scale image to fit specified frame (`resultWidth` x `resultHeight`).
- * If specified `resultWidth` and `resultHeight` are the same as or smaller than
- * the current width and height of the source image, the source image will be returned.
- *
- * @param image        Source image
- * @param resultWidth  Result width
- * @param resultHeight Result height
- * @return Scaled image or original image
- */

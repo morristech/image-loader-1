@@ -30,7 +30,6 @@ import java.io.FileInputStream
 import java.io.InputStream
 
 internal class FileBitmapLoader : BitmapLoader<File> {
-    @Throws(Throwable::class)
     override fun load(data: File, requiredSize: Size?): Bitmap? {
         var bitmap: Bitmap?
         if (requiredSize != null) {

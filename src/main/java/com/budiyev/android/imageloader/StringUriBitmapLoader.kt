@@ -30,8 +30,6 @@ import android.net.Uri
 import java.io.InputStream
 
 internal class StringUriBitmapLoader(private val mContext: Context) : BitmapLoader<String> {
-
-    @Throws(Throwable::class)
     override fun load(data: String, requiredSize: Size?): Bitmap? {
         var bitmap: Bitmap?
         val context = mContext

@@ -27,7 +27,6 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 
 internal class ByteArrayBitmapLoader : BitmapLoader<ByteArray> {
-    @Throws(Throwable::class)
     override fun load(data: ByteArray, requiredSize: Size?): Bitmap? {
         var bitmap: Bitmap?
         if (requiredSize != null) {

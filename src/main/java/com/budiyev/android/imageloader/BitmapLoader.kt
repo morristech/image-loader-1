@@ -41,6 +41,5 @@ interface BitmapLoader<T> {
      * @see ImageUtils
      */
     @WorkerThread
-    @Throws(Throwable::class)
     fun load(data: T, requiredSize: Size?): Bitmap?
 }

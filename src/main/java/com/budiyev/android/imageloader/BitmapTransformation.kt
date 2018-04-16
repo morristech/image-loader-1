@@ -46,6 +46,5 @@ interface BitmapTransformation {
      * @see ImageUtils
      */
     @WorkerThread
-    @Throws(Throwable::class)
     fun transform(bitmap: Bitmap): Bitmap
 }

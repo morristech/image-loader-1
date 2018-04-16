@@ -37,7 +37,6 @@ internal class BitmapTransformationGroup(private val mTransformations: List<Bitm
         key = sb.toString()
     }
 
-    @Throws(Throwable::class)
     override fun transform(bitmap: Bitmap): Bitmap {
         var buffer = bitmap
         for (t in mTransformations) {

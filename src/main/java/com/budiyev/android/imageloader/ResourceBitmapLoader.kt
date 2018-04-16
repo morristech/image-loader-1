@@ -28,8 +28,6 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 
 internal class ResourceBitmapLoader(private val mContext: Context) : BitmapLoader<Int> {
-
-    @Throws(Throwable::class)
     override fun load(data: Int, requiredSize: Size?): Bitmap? {
         val resources = mContext.resources
         return if (requiredSize != null) {
