@@ -33,7 +33,7 @@ internal class FileBitmapLoader : BitmapLoader<File> {
     override fun load(data: File, requiredSize: Size?): Bitmap? {
         var bitmap: Bitmap?
         if (requiredSize != null) {
-            bitmap = DataUtils.loadSampledBitmapFromFile(data, requiredSize.width, requiredSize.height)
+            bitmap = loadSampledBitmapFromFile(data, requiredSize.width, requiredSize.height)
         } else {
             var inputStream: InputStream? = null
             try {

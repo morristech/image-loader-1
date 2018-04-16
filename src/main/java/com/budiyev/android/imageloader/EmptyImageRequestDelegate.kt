@@ -24,7 +24,6 @@
 package com.budiyev.android.imageloader
 
 internal class EmptyImageRequestDelegate private constructor() : ImageRequestDelegate {
-
     override val isCancelled: Boolean
         get() = false
 

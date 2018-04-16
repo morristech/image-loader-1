@@ -30,7 +30,7 @@ internal class ByteArrayBitmapLoader : BitmapLoader<ByteArray> {
     override fun load(data: ByteArray, requiredSize: Size?): Bitmap? {
         var bitmap: Bitmap?
         if (requiredSize != null) {
-            bitmap = DataUtils.loadSampledBitmapFromByteArray(data, requiredSize.width, requiredSize.height)
+            bitmap = loadSampledBitmapFromByteArray(data, requiredSize.width, requiredSize.height)
         } else {
             bitmap = BitmapFactory.decodeByteArray(data, 0, data.size)
         }

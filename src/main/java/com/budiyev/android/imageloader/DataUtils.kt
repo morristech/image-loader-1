@@ -37,211 +37,207 @@ import java.math.BigInteger
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 
-object DataUtils {
-    private val HASH_ALGORITHM_SHA256 = "SHA-256"
+/**
+ * Generate SHA-256 hash string with [Character.MAX_RADIX] radix
+ * for specified [String]; usable for keys of [DataDescriptor] implementations
+ *
+ * @param string Source string
+ * @return SHA-256 hash string
+ * @see DataDescriptor.key
+ */
+fun generateSHA256(string: String): String {
+    try {
+        val messageDigest = MessageDigest.getInstance("SHA-256")
+        messageDigest.update(string.toByteArray())
+        return BigInteger(1, messageDigest.digest()).toString(Character.MAX_RADIX)
+    } catch (e: NoSuchAlgorithmException) {
+        throw RuntimeException(e)
+    }
+}
 
-    /**
-     * Generate SHA-256 hash string with [Character.MAX_RADIX] radix
-     * for specified [String]; usable for keys of [DataDescriptor] implementations
-     *
-     * @param string Source string
-     * @return SHA-256 hash string
-     * @see DataDescriptor.key
-     */
-    fun generateSHA256(string: String): String {
-        try {
-            val messageDigest = MessageDigest.getInstance(HASH_ALGORITHM_SHA256)
-            messageDigest.update(string.toByteArray())
-            return BigInteger(1, messageDigest.digest()).toString(Character.MAX_RADIX)
-        } catch (e: NoSuchAlgorithmException) {
-            throw RuntimeException(e)
+/**
+ * Load sampled bitmap from uri
+ *
+ * @param context        Context
+ * @param uri            URI
+ * @param requiredWidth  Required width
+ * @param requiredHeight Required height
+ * @return Loaded bitmap or `null`
+ */
+@WorkerThread
+fun loadSampledBitmapFromUri(context: Context, uri: Uri, requiredWidth: Int, requiredHeight: Int): Bitmap? {
+    val options = BitmapFactory.Options()
+    options.inJustDecodeBounds = true
+    var inputStream: InputStream? = null
+    try {
+        inputStream = uri.openInputStream(context)
+        if (inputStream == null) {
+            return null
         }
+        BitmapFactory.decodeStream(inputStream, null, options)
+    } finally {
+        close(inputStream)
+    }
+    calculateSampleSize(options, requiredWidth, requiredHeight)
+    options.inJustDecodeBounds = false
+    inputStream = null
+    try {
+        inputStream = uri.openInputStream(context)
+        return if (inputStream == null) {
+            null
+        } else BitmapFactory.decodeStream(inputStream, null, options)
+    } finally {
+        close(inputStream)
+    }
+}
+
+/**
+ * Load sampled bitmap from url
+ *
+ * @param url            URL
+ * @param requiredWidth  Required width
+ * @param requiredHeight Required height
+ * @return Loaded bitmap or `null`
+ */
+@WorkerThread
+fun loadSampledBitmapFromUrl(url: String, requiredWidth: Int, requiredHeight: Int): Bitmap? {
+    val options = BitmapFactory.Options()
+    options.inJustDecodeBounds = true
+    var inputStream: InputStream? = null
+    try {
+        inputStream = getDataStreamFromUrl(url)
+        if (inputStream == null) {
+            return null
+        }
+        BitmapFactory.decodeStream(inputStream, null, options)
+    } finally {
+        close(inputStream)
+    }
+    calculateSampleSize(options, requiredWidth, requiredHeight)
+    options.inJustDecodeBounds = false
+    inputStream = null
+    try {
+        inputStream = getDataStreamFromUrl(url)
+        return if (inputStream == null) {
+            null
+        } else BitmapFactory.decodeStream(inputStream, null, options)
+    } finally {
+        close(inputStream)
+    }
+}
+
+/**
+ * Load sampled bitmap from file
+ *
+ * @param file           File
+ * @param requiredWidth  Required width
+ * @param requiredHeight Required height
+ * @return Loaded bitmap or `null`
+ */
+@WorkerThread
+fun loadSampledBitmapFromFile(file: File, requiredWidth: Int, requiredHeight: Int): Bitmap? {
+    val options = BitmapFactory.Options()
+    options.inJustDecodeBounds = true
+    var inputStream: InputStream? = null
+    try {
+        inputStream = FileInputStream(file)
+        BitmapFactory.decodeStream(inputStream, null, options)
+    } finally {
+        close(inputStream)
+    }
+    calculateSampleSize(options, requiredWidth, requiredHeight)
+    options.inJustDecodeBounds = false
+    inputStream = null
+    try {
+        inputStream = FileInputStream(file)
+        return BitmapFactory.decodeStream(inputStream, null, options)
+    } finally {
+        close(inputStream)
     }
 
-    /**
-     * Load sampled bitmap from uri
-     *
-     * @param context        Context
-     * @param uri            URI
-     * @param requiredWidth  Required width
-     * @param requiredHeight Required height
-     * @return Loaded bitmap or `null`
-     */
-    @WorkerThread
-    fun loadSampledBitmapFromUri(context: Context, uri: Uri, requiredWidth: Int, requiredHeight: Int): Bitmap? {
-        val options = BitmapFactory.Options()
-        options.inJustDecodeBounds = true
-        var inputStream: InputStream? = null
-        try {
-            inputStream = uri.getInputStream(context)
-            if (inputStream == null) {
-                return null
-            }
-            BitmapFactory.decodeStream(inputStream, null, options)
-        } finally {
-            close(inputStream)
-        }
-        calculateSampleSize(options, requiredWidth, requiredHeight)
-        options.inJustDecodeBounds = false
-        inputStream = null
-        try {
-            inputStream = uri.getInputStream(context)
-            return if (inputStream == null) {
-                null
-            } else BitmapFactory.decodeStream(inputStream, null, options)
-        } finally {
-            close(inputStream)
-        }
-    }
+}
 
-    /**
-     * Load sampled bitmap from url
-     *
-     * @param url            URL
-     * @param requiredWidth  Required width
-     * @param requiredHeight Required height
-     * @return Loaded bitmap or `null`
-     */
-    @WorkerThread
-    fun loadSampledBitmapFromUrl(url: String, requiredWidth: Int, requiredHeight: Int): Bitmap? {
-        val options = BitmapFactory.Options()
-        options.inJustDecodeBounds = true
-        var inputStream: InputStream? = null
-        try {
-            inputStream = getDataStreamFromUrl(url)
-            if (inputStream == null) {
-                return null
-            }
-            BitmapFactory.decodeStream(inputStream, null, options)
-        } finally {
-            close(inputStream)
-        }
-        calculateSampleSize(options, requiredWidth, requiredHeight)
-        options.inJustDecodeBounds = false
-        inputStream = null
-        try {
-            inputStream = getDataStreamFromUrl(url)
-            return if (inputStream == null) {
-                null
-            } else BitmapFactory.decodeStream(inputStream, null, options)
-        } finally {
-            close(inputStream)
-        }
+/**
+ * Load sampled bitmap from file descriptor
+ *
+ * @param fileDescriptor File descriptor
+ * @param requiredWidth  Required width
+ * @param requiredHeight Required height
+ * @return Loaded bitmap or `null`
+ */
+@WorkerThread
+fun loadSampledBitmapFromFileDescriptor(fileDescriptor: FileDescriptor, requiredWidth: Int,
+        requiredHeight: Int): Bitmap? {
+    val options = BitmapFactory.Options()
+    options.inJustDecodeBounds = true
+    var inputStream: InputStream? = null
+    try {
+        inputStream = FileInputStream(fileDescriptor)
+        BitmapFactory.decodeStream(inputStream, null, options)
+    } finally {
+        close(inputStream)
     }
-
-    /**
-     * Load sampled bitmap from file
-     *
-     * @param file           File
-     * @param requiredWidth  Required width
-     * @param requiredHeight Required height
-     * @return Loaded bitmap or `null`
-     */
-    @WorkerThread
-    fun loadSampledBitmapFromFile(file: File, requiredWidth: Int, requiredHeight: Int): Bitmap? {
-        val options = BitmapFactory.Options()
-        options.inJustDecodeBounds = true
-        var inputStream: InputStream? = null
-        try {
-            inputStream = FileInputStream(file)
-            BitmapFactory.decodeStream(inputStream, null, options)
-        } finally {
-            close(inputStream)
-        }
-        calculateSampleSize(options, requiredWidth, requiredHeight)
-        options.inJustDecodeBounds = false
-        inputStream = null
-        try {
-            inputStream = FileInputStream(file)
-            return BitmapFactory.decodeStream(inputStream, null, options)
-        } finally {
-            close(inputStream)
-        }
-
+    calculateSampleSize(options, requiredWidth, requiredHeight)
+    options.inJustDecodeBounds = false
+    inputStream = null
+    try {
+        inputStream = FileInputStream(fileDescriptor)
+        return BitmapFactory.decodeStream(inputStream, null, options)
+    } finally {
+        close(inputStream)
     }
+}
 
-    /**
-     * Load sampled bitmap from file descriptor
-     *
-     * @param fileDescriptor File descriptor
-     * @param requiredWidth  Required width
-     * @param requiredHeight Required height
-     * @return Loaded bitmap or `null`
-     */
-    @WorkerThread
-    fun loadSampledBitmapFromFileDescriptor(fileDescriptor: FileDescriptor, requiredWidth: Int,
-            requiredHeight: Int): Bitmap? {
-        val options = BitmapFactory.Options()
-        options.inJustDecodeBounds = true
-        var inputStream: InputStream? = null
-        try {
-            inputStream = FileInputStream(fileDescriptor)
-            BitmapFactory.decodeStream(inputStream, null, options)
-        } finally {
-            close(inputStream)
-        }
-        calculateSampleSize(options, requiredWidth, requiredHeight)
-        options.inJustDecodeBounds = false
-        inputStream = null
-        try {
-            inputStream = FileInputStream(fileDescriptor)
-            return BitmapFactory.decodeStream(inputStream, null, options)
-        } finally {
-            close(inputStream)
-        }
-    }
+/**
+ * Load sampled bitmap from resource
+ *
+ * @param resources      Resources
+ * @param resourceId     Resource id
+ * @param requiredWidth  Required width
+ * @param requiredHeight Required height
+ * @return Loaded bitmap or `null`
+ */
+@WorkerThread
+fun loadSampledBitmapFromResource(resources: Resources, resourceId: Int, requiredWidth: Int,
+        requiredHeight: Int): Bitmap? {
+    val options = BitmapFactory.Options()
+    options.inJustDecodeBounds = true
+    BitmapFactory.decodeResource(resources, resourceId, options)
+    calculateSampleSize(options, requiredWidth, requiredHeight)
+    options.inJustDecodeBounds = false
+    return BitmapFactory.decodeResource(resources, resourceId, options)
+}
 
-    /**
-     * Load sampled bitmap from resource
-     *
-     * @param resources      Resources
-     * @param resourceId     Resource id
-     * @param requiredWidth  Required width
-     * @param requiredHeight Required height
-     * @return Loaded bitmap or `null`
-     */
-    @WorkerThread
-    fun loadSampledBitmapFromResource(resources: Resources, resourceId: Int, requiredWidth: Int,
-            requiredHeight: Int): Bitmap? {
-        val options = BitmapFactory.Options()
-        options.inJustDecodeBounds = true
-        BitmapFactory.decodeResource(resources, resourceId, options)
-        calculateSampleSize(options, requiredWidth, requiredHeight)
-        options.inJustDecodeBounds = false
-        return BitmapFactory.decodeResource(resources, resourceId, options)
-    }
+/**
+ * Load sampled bitmap from byte array
+ *
+ * @param byteArray      Byte array
+ * @param requiredWidth  Required width
+ * @param requiredHeight Required height
+ * @return Loaded bitmap or `null`
+ */
+@WorkerThread
+fun loadSampledBitmapFromByteArray(byteArray: ByteArray, requiredWidth: Int, requiredHeight: Int): Bitmap? {
+    val options = BitmapFactory.Options()
+    options.inJustDecodeBounds = true
+    BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size, options)
+    calculateSampleSize(options, requiredWidth, requiredHeight)
+    options.inJustDecodeBounds = false
+    return BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size, options)
+}
 
-    /**
-     * Load sampled bitmap from byte array
-     *
-     * @param byteArray      Byte array
-     * @param requiredWidth  Required width
-     * @param requiredHeight Required height
-     * @return Loaded bitmap or `null`
-     */
-    @WorkerThread
-    fun loadSampledBitmapFromByteArray(byteArray: ByteArray, requiredWidth: Int, requiredHeight: Int): Bitmap? {
-        val options = BitmapFactory.Options()
-        options.inJustDecodeBounds = true
-        BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size, options)
-        calculateSampleSize(options, requiredWidth, requiredHeight)
-        options.inJustDecodeBounds = false
-        return BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size, options)
+private fun calculateSampleSize(options: BitmapFactory.Options, requiredWidth: Int, requiredHeight: Int) {
+    var width = options.outWidth
+    var height = options.outHeight
+    val threshold = Math.max(requiredWidth, requiredHeight) / 4
+    if (width <= requiredWidth + threshold || height <= requiredHeight + threshold) {
+        return
     }
-
-    private fun calculateSampleSize(options: BitmapFactory.Options, requiredWidth: Int, requiredHeight: Int) {
-        var width = options.outWidth
-        var height = options.outHeight
-        val threshold = Math.max(requiredWidth, requiredHeight) / 4
-        if (width <= requiredWidth + threshold || height <= requiredHeight + threshold) {
-            return
-        }
-        var sampleSize = 1
-        while (width - requiredWidth > threshold && height - requiredHeight > threshold) {
-            width /= 2
-            height /= 2
-            sampleSize *= 2
-        }
-        options.inSampleSize = sampleSize
+    var sampleSize = 1
+    while (width - requiredWidth > threshold && height - requiredHeight > threshold) {
+        width /= 2
+        height /= 2
+        sampleSize *= 2
     }
+    options.inSampleSize = sampleSize
 }

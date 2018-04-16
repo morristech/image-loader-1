@@ -24,7 +24,5 @@
 package com.budiyev.android.imageloader
 
 internal class ResourceDataDescriptor(data: Int) : IdentifiableDataDescriptor<Int>(data, data.toString()) {
-
-    override val location: DataLocation
-        get() = DataLocation.LOCAL
+    override val location: DataLocation = DataLocation.LOCAL
 }

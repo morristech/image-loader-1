@@ -88,30 +88,27 @@ class ImageRequest<T> internal constructor(private val mResources: Resources,
     /**
      * Required image size
      */
-    fun size(requiredSize: Size?): ImageRequest<T> {
+    fun size(requiredSize: Size?) {
         if (requiredSize != null) {
             checkSize(requiredSize.width, requiredSize.height)
         }
         mRequiredSize = requiredSize
-        return this
     }
 
     /**
      * Required image size
      */
-    fun size(@Px requiredWidth: Int, @Px requiredHeight: Int): ImageRequest<T> {
+    fun size(@Px requiredWidth: Int, @Px requiredHeight: Int) {
         checkSize(requiredWidth, requiredHeight)
         mRequiredSize = Size(requiredWidth, requiredHeight)
-        return this
     }
 
     /**
      * Display image with rounded corners using maximum corner radius,
      * for square image, will lead to circle result
      */
-    fun roundCorners(): ImageRequest<T> {
+    fun roundCorners() {
         mCornerRadius = RoundedDrawable.MAX_RADIUS
-        return this
     }
 
     /**
@@ -119,100 +116,74 @@ class ImageRequest<T> internal constructor(private val mResources: Resources,
      * zero means that rounding is disabled; note that visible rounding depends on image size
      * and image view scale type
      */
-    fun roundCorners(@FloatRange(from = 0.0, to = java.lang.Float.MAX_VALUE.toDouble())
-    radius: Float): ImageRequest<T> {
+    fun roundCorners(@FloatRange(from = 0.0) radius: Float) {
         if (radius < 0f) {
             throw IllegalArgumentException("Corner radius should be greater than or equal to zero")
         }
         mCornerRadius = radius
-        return this
     }
 
     /**
      * Placeholder
      */
-    fun placeholder(placeholder: Drawable?): ImageRequest<T> {
+    fun placeholder(placeholder: Drawable?) {
         mPlaceholder = placeholder
-        return this
     }
 
     /**
      * Placeholder
      */
-    fun placeholder(@DrawableRes resId: Int): ImageRequest<T> {
+    fun placeholder(@DrawableRes resId: Int) {
         mPlaceholder = mResources.getDrawable(resId)
-        return this
     }
 
     /**
      * Error drawable, that will be displayed when image, couldn't be loaded
      */
-    fun errorDrawable(errorDrawable: Drawable?): ImageRequest<T> {
+    fun errorDrawable(errorDrawable: Drawable?) {
         mErrorDrawable = errorDrawable
-        return this
     }
 
     /**
      * Error drawable, that will be displayed when image, couldn't be loaded
      */
-    fun errorDrawable(@DrawableRes resId: Int): ImageRequest<T> {
+    fun errorDrawable(@DrawableRes resId: Int) {
         mErrorDrawable = mResources.getDrawable(resId)
-        return this
     }
 
     /**
      * Add bitmap transformation
      *
-     * @see ImageUtils
-     *
      * @see BitmapTransformation
      */
-    fun transform(transformation: BitmapTransformation): ImageRequest<T> {
+    fun transform(transformation: BitmapTransformation) {
         transformations().add(transformation)
-        return this
     }
 
     /**
      * Add bitmap transformations
      *
-     * @see ImageUtils
-     *
      * @see BitmapTransformation
      */
-    fun transform(transformations: Collection<BitmapTransformation>): ImageRequest<T> {
+    fun transform(transformations: Collection<BitmapTransformation>) {
         transformations().addAll(transformations)
-        return this
-    }
-
-    /**
-     * Add bitmap transformations
-     *
-     * @see ImageUtils
-     *
-     * @see BitmapTransformation
-     */
-    fun transform(vararg transformations: BitmapTransformation): ImageRequest<T> {
-        Collections.addAll(transformations(), *transformations)
-        return this
     }
 
     /**
      * Enable fade effect for images that isn't cached in memory,
      * supported on API 19+
      */
-    fun fade(): ImageRequest<T> {
+    fun fade() {
         mFadeEnabled = true
         mFadeDuration = DEFAULT_FADE_DURATION
-        return this
     }
 
     /**
      * Disable fade effect for images that isn't cached in memory,
      * supported on API 19+
      */
-    fun noFade(): ImageRequest<T> {
+    fun noFade() {
         mFadeEnabled = false
-        return this
     }
 
     /**
@@ -220,53 +191,47 @@ class ImageRequest<T> internal constructor(private val mResources: Resources,
      * allows to specify fade effect duration,
      * supported on API 19+
      */
-    fun fade(@IntRange(from = 0L) duration: Long): ImageRequest<T> {
+    fun fade(@IntRange(from = 0L) duration: Long) {
         if (duration < 0L) {
             throw IllegalArgumentException("Fade duration should be greater than or equal to zero")
         }
         mFadeEnabled = true
         mFadeDuration = duration
-        return this
     }
 
     /**
      * Load callback
      */
-    fun onLoaded(callback: LoadCallback?): ImageRequest<T> {
+    fun onLoaded(callback: LoadCallback?) {
         mLoadCallback = callback
-        return this
     }
 
     /**
      * Error callback
      */
-    fun onError(callback: ErrorCallback?): ImageRequest<T> {
+    fun onError(callback: ErrorCallback?) {
         mErrorCallback = callback
-        return this
     }
 
     /**
      * Display callback
      */
-    fun onDisplayed(callback: DisplayCallback?): ImageRequest<T> {
+    fun onDisplayed(callback: DisplayCallback?) {
         mDisplayCallback = callback
-        return this
     }
 
     /**
      * Don't use memory cache in this request
      */
-    fun noMemoryCache(): ImageRequest<T> {
+    fun noMemoryCache() {
         mMemoryCacheEnabled = false
-        return this
     }
 
     /**
      * Don't use storage cache in this request
      */
-    fun noStorageCache(): ImageRequest<T> {
+    fun noStorageCache() {
         mStorageCacheEnabled = false
-        return this
     }
 
     /**
@@ -384,7 +349,7 @@ class ImageRequest<T> internal constructor(private val mResources: Resources,
     }
 
     companion object {
-        private val DEFAULT_FADE_DURATION = 200L
-        private val TRANSFORMATIONS_CAPACITY = 4
+        private const val DEFAULT_FADE_DURATION: Long = 200L
+        private const val TRANSFORMATIONS_CAPACITY: Int = 4
     }
 }

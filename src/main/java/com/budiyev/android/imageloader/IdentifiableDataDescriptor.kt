@@ -23,11 +23,6 @@
  */
 package com.budiyev.android.imageloader
 
-internal abstract class IdentifiableDataDescriptor<T> protected constructor(data: T, keyBase: String) :
-        BaseDataDescriptor<T>(data) {
-    override val key: String
-
-    init {
-        key = DataUtils.generateSHA256(keyBase)
-    }
+internal abstract class IdentifiableDataDescriptor<T>(data: T, keyBase: String) : BaseDataDescriptor<T>(data) {
+    override val key: String = generateSHA256(keyBase)
 }

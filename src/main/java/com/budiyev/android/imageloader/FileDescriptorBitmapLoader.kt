@@ -32,7 +32,7 @@ import java.io.InputStream
 internal class FileDescriptorBitmapLoader : BitmapLoader<FileDescriptor> {
     override fun load(data: FileDescriptor, requiredSize: Size?): Bitmap? {
         if (requiredSize != null) {
-            return DataUtils.loadSampledBitmapFromFileDescriptor(data, requiredSize.width, requiredSize.height)
+            return loadSampledBitmapFromFileDescriptor(data, requiredSize.width, requiredSize.height)
         } else {
             var inputStream: InputStream? = null
             try {

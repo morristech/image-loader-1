@@ -34,11 +34,11 @@ internal class UriBitmapLoader(private val mContext: Context) : BitmapLoader<Uri
         var bitmap: Bitmap?
         val context = mContext
         if (requiredSize != null) {
-            bitmap = DataUtils.loadSampledBitmapFromUri(context, data, requiredSize.width, requiredSize.height)
+            bitmap = loadSampledBitmapFromUri(context, data, requiredSize.width, requiredSize.height)
         } else {
             var inputStream: InputStream? = null
             try {
-                inputStream = data.getInputStream(context)
+                inputStream = data.openInputStream(context)
                 if (inputStream == null) {
                     return null
                 }
@@ -47,7 +47,7 @@ internal class UriBitmapLoader(private val mContext: Context) : BitmapLoader<Uri
                 close(inputStream)
             }
         }
-        if (bitmap != null && isUriLocal(data)) {
+        if (bitmap != null && data.isLocal) {
             val rotation = getExifRotation(context, data)
             if (rotation != 0) {
                 bitmap = rotateAndRecycle(bitmap, rotation)

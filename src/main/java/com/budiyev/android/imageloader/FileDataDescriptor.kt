@@ -26,7 +26,5 @@ package com.budiyev.android.imageloader
 import java.io.File
 
 internal class FileDataDescriptor(data: File) : IdentifiableDataDescriptor<File>(data, data.absolutePath) {
-
-    override val location: DataLocation
-        get() = DataLocation.LOCAL
+    override val location: DataLocation = DataLocation.LOCAL
 }

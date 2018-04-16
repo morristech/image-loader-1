@@ -97,6 +97,6 @@ internal class RoundedDrawable(resources: Resources, private val mBitmap: Bitmap
     }
 
     companion object {
-        val MAX_RADIUS = -1f
+        const val MAX_RADIUS = -1f
     }
 }

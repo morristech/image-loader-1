@@ -94,7 +94,7 @@ internal fun close(closeable: Closeable?) {
     }
 }
 
-internal fun Uri.getInputStream(context: Context): InputStream? {
+internal fun Uri.openInputStream(context: Context): InputStream? {
     return when (scheme?.toLowerCase()) {
         URI_SCHEME_HTTP, URI_SCHEME_HTTPS, URI_SCHEME_FTP -> URL(toString()).openConnection().run {
             connectTimeout = CONNECT_TIMEOUT
@@ -145,19 +145,13 @@ internal fun getDrawable(view: View): Drawable? {
     }
 }
 
-internal fun isUriLocal(uri: Uri): Boolean {
-    return isUriSchemeLocal(uri.scheme)
-}
+internal val Uri.isLocal: Boolean get() = isUriSchemeLocal(scheme)
 
-internal fun isUriLocal(uri: String): Boolean {
-    val ssi = uri.indexOf(':')
-    return ssi != -1 && isUriSchemeLocal(uri.substring(0, ssi))
-
-}
-
-private fun isUriSchemeLocal(scheme: String): Boolean {
-    return ContentResolver.SCHEME_FILE == scheme || ContentResolver.SCHEME_CONTENT == scheme || ContentResolver.SCHEME_ANDROID_RESOURCE == scheme
-}
+internal val String.isUriLocal: Boolean
+    get() {
+        val ssi = indexOf(':')
+        return ssi != -1 && isUriSchemeLocal(substring(0, ssi))
+    }
 
 internal fun getExifRotation(context: Context, uri: Uri): Int = context.contentResolver.openInputStream(uri)?.use {
     getExifRotation(ExifInterface(it))
@@ -184,9 +178,13 @@ internal fun getExifRotation(exifInterface: ExifInterface): Int =
         }
 
 internal fun rotateAndRecycle(bitmap: Bitmap, rotation: Int): Bitmap {
-    val rotated = ImageUtils.rotate(bitmap, rotation.toFloat())
+    val rotated = rotate(bitmap, rotation.toFloat())
     if (bitmap != rotated) {
         bitmap.recycle()
     }
     return rotated
 }
+
+private fun isUriSchemeLocal(scheme: String?): Boolean =
+        ContentResolver.SCHEME_FILE.equals(scheme, true) || ContentResolver.SCHEME_CONTENT.equals(scheme,
+                true) || ContentResolver.SCHEME_ANDROID_RESOURCE.equals(scheme, true)

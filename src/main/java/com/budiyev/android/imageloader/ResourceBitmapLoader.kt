@@ -31,7 +31,7 @@ internal class ResourceBitmapLoader(private val mContext: Context) : BitmapLoade
     override fun load(data: Int, requiredSize: Size?): Bitmap? {
         val resources = mContext.resources
         return if (requiredSize != null) {
-            DataUtils.loadSampledBitmapFromResource(resources, data, requiredSize.width, requiredSize.height)
+            loadSampledBitmapFromResource(resources, data, requiredSize.width, requiredSize.height)
         } else {
             BitmapFactory.decodeResource(resources, data)
         }

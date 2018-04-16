@@ -46,7 +46,7 @@ interface DataDescriptor<T> {
      * caching is not available if this method returns `null`
      *
      * @return Unique identifier or `null`
-     * @see DataUtils.generateSHA256
+     * @see generateSHA256
      */
     @get:AnyThread
     val key: String?
