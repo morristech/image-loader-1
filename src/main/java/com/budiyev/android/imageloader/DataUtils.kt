@@ -46,7 +46,7 @@ object DataUtils {
      *
      * @param string Source string
      * @return SHA-256 hash string
-     * @see DataDescriptor.getKey
+     * @see DataDescriptor.key
      */
     fun generateSHA256(string: String): String {
         try {
@@ -56,7 +56,6 @@ object DataUtils {
         } catch (e: NoSuchAlgorithmException) {
             throw RuntimeException(e)
         }
-
     }
 
     /**
@@ -69,13 +68,12 @@ object DataUtils {
      * @return Loaded bitmap or `null`
      */
     @WorkerThread
-
     fun loadSampledBitmapFromUri(context: Context, uri: Uri, requiredWidth: Int, requiredHeight: Int): Bitmap? {
         val options = BitmapFactory.Options()
         options.inJustDecodeBounds = true
         var inputStream: InputStream? = null
         try {
-            inputStream = getDataStreamFromUri(context, uri)
+            inputStream = uri.getInputStream(context)
             if (inputStream == null) {
                 return null
             }
@@ -87,7 +85,7 @@ object DataUtils {
         options.inJustDecodeBounds = false
         inputStream = null
         try {
-            inputStream = getDataStreamFromUri(context, uri)
+            inputStream = uri.getInputStream(context)
             return if (inputStream == null) {
                 null
             } else BitmapFactory.decodeStream(inputStream, null, options)
@@ -105,7 +103,6 @@ object DataUtils {
      * @return Loaded bitmap or `null`
      */
     @WorkerThread
-
     fun loadSampledBitmapFromUrl(url: String, requiredWidth: Int, requiredHeight: Int): Bitmap? {
         val options = BitmapFactory.Options()
         options.inJustDecodeBounds = true
@@ -141,7 +138,6 @@ object DataUtils {
      * @return Loaded bitmap or `null`
      */
     @WorkerThread
-
     fun loadSampledBitmapFromFile(file: File, requiredWidth: Int, requiredHeight: Int): Bitmap? {
         val options = BitmapFactory.Options()
         options.inJustDecodeBounds = true

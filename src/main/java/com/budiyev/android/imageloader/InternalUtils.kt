@@ -92,18 +92,15 @@ internal fun close(closeable: Closeable?) {
         closeable.close()
     } catch (ignored: IOException) {
     }
-
 }
 
-internal fun getDataStreamFromUri(context: Context, uri: Uri): InputStream? {
-    val scheme = uri.scheme
-    if (URI_SCHEME_HTTP.equals(scheme, ignoreCase = true) || URI_SCHEME_HTTPS.equals(scheme,
-                    ignoreCase = true) || URI_SCHEME_FTP.equals(scheme, ignoreCase = true)) {
-        val connection = URL(uri.toString()).openConnection()
-        connection.connectTimeout = CONNECT_TIMEOUT
-        return connection.getInputStream()
-    } else {
-        return context.contentResolver.openInputStream(uri)
+internal fun Uri.getInputStream(context: Context): InputStream? {
+    return when (scheme?.toLowerCase()) {
+        URI_SCHEME_HTTP, URI_SCHEME_HTTPS, URI_SCHEME_FTP -> URL(toString()).openConnection().run {
+            connectTimeout = CONNECT_TIMEOUT
+            getInputStream()
+        }
+        else -> context.contentResolver.openInputStream(this)
     }
 }
 

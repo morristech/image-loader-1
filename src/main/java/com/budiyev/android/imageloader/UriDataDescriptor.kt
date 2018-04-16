@@ -26,9 +26,5 @@ package com.budiyev.android.imageloader
 import android.net.Uri
 
 internal class UriDataDescriptor(data: Uri) : IdentifiableDataDescriptor<Uri>(data, data.toString()) {
-    override val location: DataLocation
-
-    init {
-        location = if (isUriLocal(data)) DataLocation.LOCAL else DataLocation.REMOTE
-    }
+    override val location: DataLocation = if (isUriLocal(data)) DataLocation.LOCAL else DataLocation.REMOTE
 }

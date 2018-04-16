@@ -38,7 +38,7 @@ internal class UriBitmapLoader(private val mContext: Context) : BitmapLoader<Uri
         } else {
             var inputStream: InputStream? = null
             try {
-                inputStream = getDataStreamFromUri(context, data)
+                inputStream = data.getInputStream(context)
                 if (inputStream == null) {
                     return null
                 }

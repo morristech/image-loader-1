@@ -39,7 +39,7 @@ internal class StringUriBitmapLoader(private val mContext: Context) : BitmapLoad
         } else {
             var inputStream: InputStream? = null
             try {
-                inputStream = getDataStreamFromUri(context, uri)
+                inputStream = uri.getInputStream(context)
                 if (inputStream == null) {
                     return null
                 }
