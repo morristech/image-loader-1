@@ -44,10 +44,10 @@ import kotlin.reflect.KClass
 class ImageLoader internal constructor(private val context: Context, private val loadExecutor: ExecutorService,
         private val cacheExecutor: ExecutorService, private val memoryCache: ImageCache?,
         private val storageCache: ImageCache?) {
-    private val mainThreadHandler = Handler(context.mainLooper)
-    private val pauseLock = PauseLock()
-    private val descriptorFactories = ConcurrentHashMap<String, DataDescriptorFactory<Any>>()
-    private val bitmapLoaders = ConcurrentHashMap<String, BitmapLoader<Any>>()
+    private val mainThreadHandler: Handler = Handler(context.mainLooper)
+    private val pauseLock: PauseLock = PauseLock()
+    private val descriptorFactories: MutableMap<String, DataDescriptorFactory<Any>> = ConcurrentHashMap()
+    private val bitmapLoaders: MutableMap<String, BitmapLoader<Any>> = ConcurrentHashMap()
 
     /**
      * Whether to pause image loading. If this property is set to `true`,
@@ -84,7 +84,7 @@ class ImageLoader internal constructor(private val context: Context, private val
      * @param data Source data, any registered data type
      * @return New image request for specified data
      * @throws IllegalArgumentException if specified data type is not registered
-     * @see .registerDataType
+     * @see registerDataType
      */
     @Suppress("UNCHECKED_CAST")
     fun <T : Any> from(data: T): ImageRequest<T> {
@@ -103,7 +103,7 @@ class ImageLoader internal constructor(private val context: Context, private val
      *
      * @param data Data
      * @throws IllegalArgumentException if specified data type is not registered
-     * @see .registerDataType
+     * @see registerDataType
      */
     fun invalidate(data: Any) {
         val dataClassName = data.javaClass.name
@@ -121,22 +121,25 @@ class ImageLoader internal constructor(private val context: Context, private val
      * @see DataDescriptorFactory
      *
      * @see DataDescriptor
-     *
      * @see BitmapLoader
-     *
-     * @see .unregisterDataType
+     * @see unregisterDataType
      */
     @Suppress("UNCHECKED_CAST")
     fun <T : Any> registerDataType(dataClass: Class<T>, descriptorFactory: DataDescriptorFactory<T>,
             bitmapLoader: BitmapLoader<T>) {
-        val dataClassName = dataClass.name
-        descriptorFactories[dataClassName] = descriptorFactory as DataDescriptorFactory<Any>
-        bitmapLoaders[dataClassName] = bitmapLoader as BitmapLoader<Any>
+        registerDataType(dataClass.name, descriptorFactory, bitmapLoader)
     }
 
     fun <T : Any> registerDataType(dataClass: KClass<T>, descriptorFactory: DataDescriptorFactory<T>,
             bitmapLoader: BitmapLoader<T>) {
-        registerDataType(dataClass.java, descriptorFactory, bitmapLoader)
+        registerDataType(dataClass.java.name, descriptorFactory, bitmapLoader)
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    private fun <T : Any> registerDataType(dataClassName: String, descriptorFactory: DataDescriptorFactory<T>,
+            bitmapLoader: BitmapLoader<T>) {
+        descriptorFactories[dataClassName] = descriptorFactory as DataDescriptorFactory<Any>
+        bitmapLoaders[dataClassName] = bitmapLoader as BitmapLoader<Any>
     }
 
     /**
@@ -145,24 +148,16 @@ class ImageLoader internal constructor(private val context: Context, private val
      * @param dataClass Source data class
      */
     fun unregisterDataType(dataClass: Class<*>) {
-        val dataClassName = dataClass.name
+        unregisterDataType(dataClass.name)
+    }
+
+    fun unregisterDataType(dataClass: KClass<*>) {
+        unregisterDataType(dataClass.java.name)
+    }
+
+    private fun unregisterDataType(dataClassName: String) {
         descriptorFactories.remove(dataClassName)
         bitmapLoaders.remove(dataClassName)
-    }
-
-    /**
-     * Whether to pause image loading. If this method is invoked with `true` parameter,
-     * all loading actions will be paused until it will be invoked with `false`.
-     */
-    fun setPauseLoading(paused: Boolean) {
-        pauseLock.isPaused = paused
-    }
-
-    /**
-     *
-     */
-    fun setInterruptLoadingEarly(interrupt: Boolean) {
-        pauseLock.isInterruptEarly = interrupt
     }
 
     /**
@@ -172,7 +167,6 @@ class ImageLoader internal constructor(private val context: Context, private val
      * default instance ([.with]) automatically cares about it
      *
      * @see ComponentCallbacks2
-     *
      * @see Context.registerComponentCallbacks
      */
     fun clearMemoryCache() {
