@@ -38,6 +38,6 @@ class Size(val width: Int, val height: Int) {
     }
 
     override fun toString(): String {
-        return "($width; $height)"
+        return "($width:$height)"
     }
 }
