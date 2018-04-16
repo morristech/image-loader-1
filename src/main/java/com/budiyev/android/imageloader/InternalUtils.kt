@@ -30,7 +30,6 @@ import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.net.Uri
-import android.os.Build
 import android.support.annotation.MainThread
 import android.support.media.ExifInterface
 import android.view.View
@@ -43,12 +42,12 @@ import java.io.InputStream
 import java.net.URL
 
 internal object InternalUtils {
-    private val CONNECT_TIMEOUT = 10000
-    private val MAX_POOL_SIZE = 4
-    private val MIN_POOL_SIZE = 1
-    private val URI_SCHEME_HTTP = "http"
-    private val URI_SCHEME_HTTPS = "https"
-    private val URI_SCHEME_FTP = "ftp"
+    private const val CONNECT_TIMEOUT = 10000
+    private const val MAX_POOL_SIZE = 4
+    private const val MIN_POOL_SIZE = 1
+    private const val URI_SCHEME_HTTP = "http"
+    private const val URI_SCHEME_HTTPS = "https"
+    private const val URI_SCHEME_FTP = "ftp"
 
     val loadPoolSize: Int
         get() = Math.min(Runtime.getRuntime().availableProcessors(), MAX_POOL_SIZE)
@@ -132,11 +131,7 @@ internal object InternalUtils {
         if (view is ImageView) {
             view.setImageDrawable(drawable)
         } else {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                view.background = drawable
-            } else {
-                view.setBackgroundDrawable(drawable)
-            }
+            view.background = drawable
         }
     }
 
@@ -144,12 +139,7 @@ internal object InternalUtils {
         if (view is ImageView) {
             view.setImageBitmap(bitmap)
         } else {
-            val drawable = BitmapDrawable(resources, bitmap)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                view.background = drawable
-            } else {
-                view.setBackgroundDrawable(drawable)
-            }
+            view.background = BitmapDrawable(resources, bitmap)
         }
     }
 
@@ -175,48 +165,29 @@ internal object InternalUtils {
         return ContentResolver.SCHEME_FILE == scheme || ContentResolver.SCHEME_CONTENT == scheme || ContentResolver.SCHEME_ANDROID_RESOURCE == scheme
     }
 
-    fun getExifRotation(context: Context, uri: Uri): Int {
-        var inputStream: InputStream? = null
-        try {
-            inputStream = context.contentResolver.openInputStream(uri)
-            return if (inputStream != null) {
-                getExifRotation(ExifInterface(inputStream))
-            } else {
-                0
+    fun getExifRotation(context: Context, uri: Uri): Int = context.contentResolver.openInputStream(uri)?.use {
+        getExifRotation(ExifInterface(it))
+    } ?: 0
+
+    fun getExifRotation(file: File): Int = try {
+        getExifRotation(ExifInterface(file.absolutePath))
+    } catch (e: IOException) {
+        0
+    }
+
+    fun getExifRotation(bytes: ByteArray): Int = try {
+        getExifRotation(ExifInterface(ByteArrayInputStream(bytes)))
+    } catch (e: IOException) {
+        0
+    }
+
+    fun getExifRotation(exifInterface: ExifInterface): Int =
+            when (exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)) {
+                ExifInterface.ORIENTATION_ROTATE_90 -> 90
+                ExifInterface.ORIENTATION_ROTATE_180 -> 180
+                ExifInterface.ORIENTATION_ROTATE_270 -> 270
+                else -> 0
             }
-        } catch (e: IOException) {
-            return 0
-        } finally {
-            close(inputStream)
-        }
-    }
-
-    fun getExifRotation(file: File): Int {
-        try {
-            return getExifRotation(ExifInterface(file.absolutePath))
-        } catch (e: IOException) {
-            return 0
-        }
-
-    }
-
-    fun getExifRotation(bytes: ByteArray): Int {
-        try {
-            return getExifRotation(ExifInterface(ByteArrayInputStream(bytes)))
-        } catch (e: IOException) {
-            return 0
-        }
-
-    }
-
-    fun getExifRotation(exifInterface: ExifInterface): Int {
-        when (exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)) {
-            ExifInterface.ORIENTATION_ROTATE_90 -> return 90
-            ExifInterface.ORIENTATION_ROTATE_180 -> return 180
-            ExifInterface.ORIENTATION_ROTATE_270 -> return 270
-            else -> return 0
-        }
-    }
 
     fun rotateAndRecycle(bitmap: Bitmap, rotation: Int): Bitmap {
         val rotated = ImageUtils.rotate(bitmap, rotation.toFloat())
