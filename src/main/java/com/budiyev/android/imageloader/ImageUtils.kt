@@ -135,20 +135,12 @@ fun ImageRequest<*>.fitCenter(resultWidth: Int, resultHeight: Int) =
         transform(FitCenterTransformation(resultWidth, resultHeight))
 
 /**
- * Scale image to fit specified frame (`resultWidth` x `resultHeight`)
- *
- * @see BitmapTransformation
- */
-fun ImageRequest<*>.scaleToFit(resultWidth: Int, resultHeight: Int) =
-        transform(ScaleToFitTransformation(resultWidth, resultHeight, false))
-
-/**
  * Scale image to fit specified frame (`resultWidth` x `resultHeight`),
  * upscale image if needed if `upscale` set to true
  *
  * @see BitmapTransformation
  */
-fun ImageRequest<*>.scaleToFit(resultWidth: Int, resultHeight: Int, upscale: Boolean) =
+fun ImageRequest<*>.scaleToFit(resultWidth: Int, resultHeight: Int, upscale: Boolean = false) =
         transform(ScaleToFitTransformation(resultWidth, resultHeight, upscale))
 
 /**
